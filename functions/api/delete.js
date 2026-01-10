@@ -8,10 +8,6 @@ export async function onRequestDelete(context) {
     }
 
     try {
-        // Delete link (visits will be deleted via CASCADE if supported by D1/SQLite FK, 
-        // but D1 FK support might vary, so let's delete visits first manually to be safe or rely on schema)
-        // The schema says ON DELETE CASCADE, so we just delete from links.
-
         const info = await env.DB.prepare("DELETE FROM links WHERE id = ?").bind(id).run();
 
         if (info.success) {
@@ -21,5 +17,39 @@ export async function onRequestDelete(context) {
         }
     } catch (err) {
         return new Response(err.message, { status: 500 });
+    }
+}
+
+// 批量删除
+export async function onRequestPost(context) {
+    const { request, env } = context;
+
+    try {
+        const { ids } = await request.json();
+
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return new Response(JSON.stringify({ error: "IDs array is required" }), {
+                status: 400,
+                headers: { "Content-Type": "application/json" }
+            });
+        }
+
+        // 批量删除
+        const placeholders = ids.map(() => '?').join(',');
+        const deleteQuery = `DELETE FROM links WHERE id IN (${placeholders})`;
+
+        const result = await env.DB.prepare(deleteQuery).bind(...ids).run();
+
+        return new Response(JSON.stringify({
+            success: true,
+            deleted: ids.length
+        }), {
+            headers: { "Content-Type": "application/json" }
+        });
+    } catch (err) {
+        return new Response(JSON.stringify({ error: err.message }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" }
+        });
     }
 }

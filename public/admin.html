@@ -81,9 +81,41 @@
 
             <!-- Link List Section -->
             <div class="card" style="margin-top:24px;">
-                <h3 style="margin-bottom:16px;">链接列表</h3>
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+                    <h3 style="margin:0;">链接列表</h3>
+                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                        <!-- Search -->
+                        <input type="text" id="searchInput" placeholder="搜索链接或备注..."
+                            style="padding:10px 16px; width:200px; border-radius:99px; border:1px solid rgba(0,0,0,0.1); font-size:14px;">
+                        <button id="searchBtn" class="btn-secondary" style="padding:10px 16px;">搜索</button>
+                        <!-- Batch Delete -->
+                        <button id="batchDeleteBtn" class="delete-btn" style="display:none; padding:10px 16px;">
+                            删除选中 (<span id="selectedCount">0</span>)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Select All -->
+                <div id="selectAllContainer"
+                    style="display:none; padding:10px 0; border-bottom:1px solid rgba(0,0,0,0.05); margin-bottom:8px;">
+                    <label
+                        style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:14px; color:var(--text-secondary);">
+                        <input type="checkbox" id="selectAllCheckbox" style="width:18px; height:18px; cursor:pointer;">
+                        全选当前页
+                    </label>
+                </div>
+
                 <div id="linkList" class="link-list">
                     <!-- Links will be inserted here -->
+                </div>
+
+                <!-- Pagination -->
+                <div id="pagination"
+                    style="display:flex; justify-content:center; align-items:center; gap:8px; margin-top:20px; padding-top:16px; border-top:1px solid rgba(0,0,0,0.05);">
+                    <button id="prevPageBtn" class="btn-secondary" style="padding:8px 16px;">上一页</button>
+                    <span id="pageInfo" style="font-size:14px; color:var(--text-secondary);">第 1 页</span>
+                    <button id="nextPageBtn" class="btn-secondary" style="padding:8px 16px;">下一页</button>
                 </div>
             </div>
         </div>

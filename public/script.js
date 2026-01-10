@@ -23,30 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     }
 
-    // --- Utils: Toast System ---
-    function showToast(message, type = 'success') {
-        let container = document.getElementById('toast-container');
-        if (!container) {
-            container = document.createElement('div');
-            container.id = 'toast-container';
-            document.body.appendChild(container);
-        }
-
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.textContent = message;
-
-        container.appendChild(toast);
-
-        // Auto remove
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateY(-20px) scale(0.9)';
-            toast.style.transition = 'all 0.3s cubic-bezier(0.32, 0, 0.67, 0)';
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
-    }
-
     // URL Shortener Logic
     const shortenForm = document.getElementById('shortenForm');
     if (shortenForm) {
@@ -61,13 +37,11 @@ document.addEventListener('DOMContentLoaded', () => {
         shortenForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // UI Reset
             errorMsg.style.display = 'none';
             resultDiv.classList.remove('visible');
             submitBtn.disabled = true;
             submitBtn.textContent = '处理中...';
 
-            // Auto-fix URL protocol
             let rawUrl = urlInput.value.trim();
             if (!/^https?:\/\//i.test(rawUrl)) {
                 rawUrl = 'https://' + rawUrl;
@@ -80,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({
                         url: rawUrl,
                         slug: slugInput.value.trim() || undefined,
-                        expiration: document.getElementById('expirationSelect').value // Send expiration
+                        expiration: document.getElementById('expirationSelect').value
                     })
                 });
 
@@ -100,14 +74,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 showToast('短链接生成成功！');
 
-                // Auto Copy
                 navigator.clipboard.writeText(fullUrl).then(() => {
                     showToast('已自动复制到剪贴板 ✅');
                 }).catch(err => {
                     console.error('Auto copy failed:', err);
                 });
 
-                // Clear inputs on success
                 urlInput.value = '';
                 slugInput.value = '';
 
@@ -128,9 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 copyBtn.textContent = '已复制';
                 copyBtn.style.background = 'var(--primary)';
                 copyBtn.style.color = '#fff';
-
                 showToast('链接已复制到剪贴板');
-
                 setTimeout(() => {
                     copyBtn.textContent = originalText;
                     copyBtn.style.background = '';
@@ -151,9 +121,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let authToken = localStorage.getItem('adminToken');
 
-        const loadLinks = async () => {
+        // 分页和筛选状态
+        let currentPage = 1;
+        let pageSize = 20;
+        let searchQuery = '';
+        let selectedIds = new Set();
+
+        const loadLinks = async (page = 1, search = '') => {
+            currentPage = page;
+            searchQuery = search;
+
             try {
-                const response = await fetch('/api/list', {
+                const params = new URLSearchParams({
+                    page: page.toString(),
+                    pageSize: pageSize.toString()
+                });
+                if (search) params.append('search', search);
+
+                const response = await fetch(`/api/list?${params}`, {
                     headers: { 'Admin-Token': authToken }
                 });
 
@@ -161,8 +146,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error('未授权');
                 }
 
-                const links = await response.json();
-                renderLinks(links);
+                const result = await response.json();
+                renderLinks(result.data || []);
+                renderPagination(result.pagination);
                 showDashboard();
             } catch (err) {
                 console.error("Load Links Error:", err);
@@ -180,38 +166,171 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const renderLinks = (links) => {
-            if (!Array.isArray(links)) links = [];
-            if (links.length === 0) {
+            // 显示全选容器和批量删除按钮
+            const selectAllContainer = document.getElementById('selectAllContainer');
+            const batchDeleteBtn = document.getElementById('batchDeleteBtn');
+
+            if (selectAllContainer) selectAllContainer.style.display = links.length > 0 ? 'block' : 'none';
+
+            // 清空选中状态
+            selectedIds.clear();
+            updateBatchDeleteBtn();
+
+            if (!Array.isArray(links) || links.length === 0) {
                 linkList.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">暂无数据</div>';
                 return;
             }
+
             linkList.innerHTML = links.map(link => `
-                <div class="link-item">
-                    <div class="link-info">
-                        <a href="/${link.slug}" target="_blank" class="link-slug">/${link.slug}</a>
-                        <a href="${link.url}" target="_blank" class="link-origin" title="${link.url}">${link.url}</a>
-                        <div class="link-meta">
-                            ${link.visits || 0} 次访问 • ${new Date(link.created_at * 1000).toLocaleDateString()}
-                            ${link.max_visits ? ' • <span class="badge">阅后即焚</span>' : ''}
-                            ${link.expires_at ? ` • 📅 ${new Date(link.expires_at * 1000).toLocaleDateString()} 过期` : ''}
-                            ${link.note ? `<div style="margin-top:4px; font-size:12px; color:#666;">📝 ${link.note}</div>` : ''}
+                <div class="link-item" data-id="${link.id}">
+                    <div style="display:flex; align-items:flex-start; gap:12px; flex:1; min-width:0;">
+                        <input type="checkbox" class="link-checkbox" data-id="${link.id}" 
+                            style="width:18px; height:18px; margin-top:4px; cursor:pointer; flex-shrink:0;">
+                        <div class="link-info">
+                            <a href="/${link.slug}" target="_blank" class="link-slug">/${link.slug}</a>
+                            <a href="${link.url}" target="_blank" class="link-origin" title="${link.url}">${link.url}</a>
+                            <div class="link-meta">
+                                ${link.visits || 0} 次访问 • ${new Date(link.created_at * 1000).toLocaleDateString()}
+                                ${link.max_visits ? ' • <span class="badge">阅后即焚</span>' : ''}
+                                ${link.expires_at ? ` • 📅 ${new Date(link.expires_at * 1000).toLocaleDateString()} 过期` : ''}
+                                ${link.note ? `<div style="margin-top:4px; font-size:12px; color:#666;">📝 ${link.note}</div>` : ''}
+                            </div>
                         </div>
                     </div>
                     <div class="actions">
-                        <button onclick="updateNote(${link.id}, '${link.note || ''}')" class="note-btn" style="background:rgba(255,149,0,0.1); color:#ff9500;">备注</button>
+                        <button onclick="updateNote(${link.id}, '${(link.note || '').replace(/'/g, "\\'")}')" class="note-btn" style="background:rgba(255,149,0,0.1); color:#ff9500;">备注</button>
                         <button onclick="updateLink(${link.id})" class="edit-btn" style="background:rgba(0,122,255,0.1); color:#007aff;">有效期</button>
                         <button onclick="deleteLink(${link.id})" class="delete-btn">删除</button>
                     </div>
                 </div>
             `).join('');
+
+            // 绑定复选框事件
+            document.querySelectorAll('.link-checkbox').forEach(cb => {
+                cb.addEventListener('change', (e) => {
+                    const id = parseInt(e.target.dataset.id);
+                    if (e.target.checked) {
+                        selectedIds.add(id);
+                    } else {
+                        selectedIds.delete(id);
+                    }
+                    updateBatchDeleteBtn();
+                    updateSelectAllCheckbox();
+                });
+            });
         };
+
+        const renderPagination = (pagination) => {
+            const prevBtn = document.getElementById('prevPageBtn');
+            const nextBtn = document.getElementById('nextPageBtn');
+            const pageInfo = document.getElementById('pageInfo');
+
+            if (!pagination) return;
+
+            pageInfo.textContent = `第 ${pagination.page} / ${pagination.totalPages} 页 (共 ${pagination.total} 条)`;
+            prevBtn.disabled = pagination.page <= 1;
+            nextBtn.disabled = pagination.page >= pagination.totalPages;
+        };
+
+        const updateBatchDeleteBtn = () => {
+            const btn = document.getElementById('batchDeleteBtn');
+            const countSpan = document.getElementById('selectedCount');
+            if (btn && countSpan) {
+                countSpan.textContent = selectedIds.size;
+                btn.style.display = selectedIds.size > 0 ? 'inline-block' : 'none';
+            }
+        };
+
+        const updateSelectAllCheckbox = () => {
+            const selectAll = document.getElementById('selectAllCheckbox');
+            const checkboxes = document.querySelectorAll('.link-checkbox');
+            if (selectAll && checkboxes.length > 0) {
+                selectAll.checked = selectedIds.size === checkboxes.length;
+                selectAll.indeterminate = selectedIds.size > 0 && selectedIds.size < checkboxes.length;
+            }
+        };
+
+        // 全选事件
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', (e) => {
+                const checkboxes = document.querySelectorAll('.link-checkbox');
+                checkboxes.forEach(cb => {
+                    cb.checked = e.target.checked;
+                    const id = parseInt(cb.dataset.id);
+                    if (e.target.checked) {
+                        selectedIds.add(id);
+                    } else {
+                        selectedIds.delete(id);
+                    }
+                });
+                updateBatchDeleteBtn();
+            });
+        }
+
+        // 批量删除事件
+        const batchDeleteBtn = document.getElementById('batchDeleteBtn');
+        if (batchDeleteBtn) {
+            batchDeleteBtn.addEventListener('click', async () => {
+                if (selectedIds.size === 0) return;
+                if (!confirm(`确定要删除选中的 ${selectedIds.size} 个链接吗？`)) return;
+
+                try {
+                    const response = await fetch('/api/delete', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Admin-Token': authToken
+                        },
+                        body: JSON.stringify({ ids: Array.from(selectedIds) })
+                    });
+
+                    if (response.ok) {
+                        showToast(`已删除 ${selectedIds.size} 个链接`);
+                        selectedIds.clear();
+                        loadLinks(currentPage, searchQuery);
+                        loadDashboard();
+                    } else {
+                        showToast('批量删除失败', 'error');
+                    }
+                } catch (err) {
+                    showToast('操作失败', 'error');
+                }
+            });
+        }
+
+        // 搜索事件
+        const searchBtn = document.getElementById('searchBtn');
+        const searchInput = document.getElementById('searchInput');
+        if (searchBtn && searchInput) {
+            searchBtn.addEventListener('click', () => {
+                loadLinks(1, searchInput.value.trim());
+            });
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    loadLinks(1, searchInput.value.trim());
+                }
+            });
+        }
+
+        // 分页事件
+        const prevPageBtn = document.getElementById('prevPageBtn');
+        const nextPageBtn = document.getElementById('nextPageBtn');
+        if (prevPageBtn) {
+            prevPageBtn.addEventListener('click', () => {
+                if (currentPage > 1) loadLinks(currentPage - 1, searchQuery);
+            });
+        }
+        if (nextPageBtn) {
+            nextPageBtn.addEventListener('click', () => {
+                loadLinks(currentPage + 1, searchQuery);
+            });
+        }
 
         const showDashboard = () => {
             adminLogin.classList.add('hidden');
             dashboard.classList.remove('hidden');
-            document.querySelector('.container').classList.add('wide'); // Widen Layout
-            if (dashboard.classList.contains('hidden')) dashboard.style.display = 'block';
-            if (adminLogin.classList.contains('hidden')) adminLogin.style.display = 'none';
+            document.querySelector('.container').classList.add('wide');
         };
 
         const logout = () => {
@@ -230,8 +349,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 if (response.ok) {
                     showToast('链接已删除');
-                    loadLinks();
-                    loadDashboard(); // Reload stats
+                    loadLinks(currentPage, searchQuery);
+                    loadDashboard();
                 } else {
                     showToast('删除失败', 'error');
                 }
@@ -239,7 +358,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast('操作失败', 'error');
             }
         };
-
 
         window.updateNote = async (id, currentNote) => {
             const newNote = prompt("修改备注：", currentNote);
@@ -253,7 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 if (response.ok) {
                     showToast('备注已更新');
-                    loadLinks();
+                    loadLinks(currentPage, searchQuery);
                 } else {
                     showToast('更新失败', 'error');
                 }
@@ -287,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 if (response.ok) {
                     showToast('有效期已更新');
-                    loadLinks();
+                    loadLinks(currentPage, searchQuery);
                 } else {
                     showToast('更新失败', 'error');
                 }
@@ -338,13 +456,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.daily_limit !== undefined) {
                     document.getElementById('dailyLimitInput').value = data.daily_limit;
                 }
-                // Determine retention days (need to fetch from DB via settings API? 
-                // Currently settings API only returns daily_limit? Let's check settings.js or modify it.
-                // Or just rely on default 30 if not set. Wait, settings.js needs update to return all settings?
-                // For now, let's assume settings API returns *all* settings or modify it.
-                if (data.retention_days !== undefined) {
-                    document.getElementById('retentionDaysInput').value = data.retention_days;
-                }
             } catch (err) {
                 console.error("Settings Error:", err);
             }
@@ -385,48 +496,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Data Clean Logic
-        const cleanForm = document.getElementById('cleanForm');
-        if (cleanForm) {
-            cleanForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                if (!confirm("确定要清理旧日志吗？这无法撤销。")) return; // Double confirmation
-
-                const btn = cleanForm.querySelector('button');
-                const originalText = btn.textContent;
-                btn.textContent = '清理中...';
-                btn.disabled = true;
-
-                const days = parseInt(document.getElementById('retentionDaysInput').value);
-                try {
-                    const response = await fetch('/api/clean', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Admin-Token': authToken
-                        },
-                        body: JSON.stringify({ retention_days: days })
-                    });
-                    const data = await response.json();
-                    if (response.ok) {
-                        showToast(data.message || '清理完成');
-                    } else {
-                        showToast(data.error || '清理失败', 'error');
-                    }
-                } catch (err) {
-                    showToast('清理错误: ' + err.message, 'error');
-                } finally {
-                    btn.textContent = originalText;
-                    btn.disabled = false;
-                }
-            });
-        }
-
         function renderChart(trendData) {
             const ctx = document.getElementById('trendChart');
             if (!ctx) return;
 
-            // Destroy existing chart if any
             if (window.myTrendChart) {
                 window.myTrendChart.destroy();
             }
@@ -451,7 +524,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false, // Critical for custom height
+                    maintainAspectRatio: false,
                     interaction: {
                         mode: 'index',
                         intersect: false,
