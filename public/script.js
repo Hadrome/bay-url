@@ -103,11 +103,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderLinks(links);
                 showDashboard();
             } catch (err) {
-                logout();
+                console.error("Load Links Error:", err);
+                // Check if it's an auth error (401)
+                if (err.message === '未授权') {
+                    logout();
+                } else {
+                    linkList.innerHTML = `<div style="text-align:center;color:red;padding:20px;">加载失败: ${err.message}</div>`;
+                }
             }
         };
 
         const renderLinks = (links) => {
+            if (!Array.isArray(links)) links = [];
             if (links.length === 0) {
                 linkList.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">暂无数据</div>';
                 return;
