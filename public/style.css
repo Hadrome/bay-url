@@ -101,7 +101,8 @@ body::before {
 .logo-text {
     font-size: 48px;
     font-weight: 800;
-    background: linear-gradient(135deg, #FF9500 0%, #FF2D55 100%);
+    /* Use Theme Blue/Purple instead of Orange */
+    background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: -1px;
@@ -109,18 +110,7 @@ body::before {
     display: inline-block;
 }
 
-.logo-text::after {
-    content: 'BayMaxen';
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    z-index: -1;
-    background: inherit;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: blur(8px);
-    opacity: 0.5;
-}
+/* Removed blurry shadow ::after pseudo-element to look cleaner */
 
 .logo-subtitle {
     font-size: 14px;
@@ -141,6 +131,22 @@ body::before {
     box-shadow: var(--shadow-depth-2);
     border: 1px solid rgba(255, 255, 255, 0.4);
     transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* ... */
+/* Chart Container Fix */
+.chart-container {
+    height: 320px;
+    /* Increased height */
+    position: relative;
+    width: 100%;
+    /* Ensure full width */
+}
+
+/* Ensure canvas fills container */
+canvas#trendChart {
+    width: 100% !important;
+    height: 100% !important;
 }
 
 h1 {

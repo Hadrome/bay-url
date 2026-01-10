@@ -337,34 +337,58 @@ document.addEventListener('DOMContentLoaded', () => {
             window.myTrendChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: trendData.map(d => new Date(d.date).toLocaleDateString()),
+                    labels: trendData.length ? trendData.map(d => new Date(d.date).toLocaleDateString()) : ['今日'],
                     datasets: [{
                         label: '每日访问量',
-                        data: trendData.map(d => d.visits),
-                        borderColor: '#0070f3',
-                        backgroundColor: 'rgba(0, 112, 243, 0.1)',
+                        data: trendData.length ? trendData.map(d => d.visits) : [0],
+                        borderColor: '#007aff',
+                        backgroundColor: 'rgba(0, 122, 255, 0.1)',
+                        borderWidth: 2,
                         fill: true,
                         tension: 0.4,
                         pointRadius: 4,
-                        pointHoverRadius: 6
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#007aff',
+                        pointBorderWidth: 2
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: false, // Critical for custom height
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
                     plugins: {
-                        legend: { display: false }
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            cornerRadius: 8,
+                            displayColors: false
+                        }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
                             border: { display: false },
-                            grid: { borderDash: [4, 4], color: '#eee' },
-                            ticks: { font: { family: 'Inter' } }
+                            grid: {
+                                borderDash: [4, 4],
+                                color: 'rgba(0,0,0,0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: { family: 'Inter', size: 11 },
+                                color: '#8e8e93',
+                                maxTicksLimit: 5
+                            }
                         },
                         x: {
                             grid: { display: false },
-                            ticks: { font: { family: 'Inter' } }
+                            ticks: {
+                                font: { family: 'Inter', size: 11 },
+                                color: '#8e8e93'
+                            }
                         }
                     }
                 }
