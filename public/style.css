@@ -390,13 +390,17 @@ h3 {
 /* Action buttons container */
 .actions {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: row;
+    flex-wrap: nowrap;
     gap: 8px;
-    flex-shrink: 0;
+    align-items: center;
 }
 
 .actions button {
     white-space: nowrap;
+    padding: 8px 14px;
+    font-size: 13px;
+    border-radius: 99px;
 }
 
 /* Result Area (Pop-up style) */

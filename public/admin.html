@@ -24,81 +24,74 @@
         </div>
 
         <!-- Dashboard View -->
-        <div id="dashboard" class="card hidden">
-            <div class="admin-header">
-                <h2>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round"
-                        style="vertical-align: middle; margin-right: 8px;">
-                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                    </svg>
-                    链接管理
-                </h2>
-                <button id="logoutBtn" class="btn-secondary">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round"
-                        style="vertical-align: middle; margin-right: 4px;">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                    退出
-                </button>
-            </div>
-
-            <!-- Dashboard Stats -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h3>今日访问</h3>
-                    <div class="stat-value" id="todayVisits">0</div>
+        <div id="dashboard" class="hidden">
+            <div class="card">
+                <div class="admin-header">
+                    <h2>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            style="vertical-align: middle; margin-right: 8px;">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                        </svg>
+                        链接管理
+                    </h2>
+                    <button id="logoutBtn" class="btn-secondary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            style="vertical-align: middle; margin-right: 4px;">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        退出
+                    </button>
                 </div>
-                <div class="stat-card">
-                    <h3>今日新增</h3>
-                    <div class="stat-value" id="todayLinks">0</div>
+
+                <!-- Dashboard Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>今日访问</h3>
+                        <div class="stat-value" id="todayVisits">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>今日新增</h3>
+                        <div class="stat-value" id="todayLinks">0</div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Chart -->
-            <div class="chart-container">
-                <canvas id="trendChart"></canvas>
-            </div>
+                <!-- Chart -->
+                <div class="chart-container">
+                    <canvas id="trendChart"></canvas>
+                </div>
 
-            <!-- Settings & Maintenance Grid -->
-            <div class="stats-grid">
                 <!-- System Settings -->
-                <div class="settings-panel" style="margin-bottom:0; height:100%;">
+                <div class="settings-panel">
                     <h3>系统设置</h3>
                     <form id="settingsForm" style="margin-top:15px;">
-                        <div style="margin-bottom:12px;">
-                            <label
-                                style="display:block; font-size:13px; color:var(--text-secondary); margin-bottom:4px;">每日创建限额</label>
-                            <div style="display:flex; gap:8px;">
-                                <input type="number" id="dailyLimitInput" min="0" step="100" style="padding:10px;">
-                                <button type="submit" style="width:auto; padding:10px 16px;">保存</button>
-                            </div>
+                        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                            <label style="font-size:14px; color:var(--text-secondary);">每日创建限额</label>
+                            <input type="number" id="dailyLimitInput" min="0" step="100"
+                                style="padding:10px; width:120px;">
+                            <button type="submit" style="width:auto; padding:10px 20px;">保存</button>
                         </div>
                     </form>
                 </div>
-
-                <!-- Data Maintenance Removed as per user request -->
             </div>
-            <!-- End Stats Grid -->
+
+            <!-- Link List Section -->
+            <div class="card" style="margin-top:24px;">
+                <h3 style="margin-bottom:16px;">链接列表</h3>
+                <div id="linkList" class="link-list">
+                    <!-- Links will be inserted here -->
+                </div>
+            </div>
         </div>
 
-        <div class="admin-header" style="margin-top:30px; border-top:1px solid #eee; padding-top:20px;">
-            <h3>链接列表</h3>
-        </div>
-
-        <div id="linkList" class="link-list">
-            <!-- Links will be inserted here -->
-        </div>
-    </div>
-
-    <footer>
-        <p>&copy; 2026 BayUrl Project. <a href="/" style="color: var(--text-primary); text-decoration: none;">返回首页</a>
-        </p>
-    </footer>
+        <!-- Footer inside container -->
+        <footer>
+            <p>&copy; 2026 BayUrl Project. <a href="/">返回首页</a></p>
+        </footer>
     </div>
     <script src="script.js"></script>
 </body>
