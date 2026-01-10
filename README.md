@@ -1,7 +1,5 @@
 # ☁️ BayUrl - Cloudflare 极简短链服务
 
-# ☁️ BayUrl - Cloudflare 极简短链服务
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 **BayUrl** 是一个运行在 Cloudflare Pages 上的现代化短链接服务。它无需购买服务器，利用 Cloudflare 的全球边缘网络和 D1 数据库，提供极速、免费、稳定的短链生成与重定向服务。
