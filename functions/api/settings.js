@@ -14,8 +14,6 @@ export async function onRequestGet(context) {
             results.forEach(row => {
                 if (row.key === 'daily_limit') settings.daily_limit = parseInt(row.value);
                 if (row.key === 'retention_days') settings.retention_days = parseInt(row.value);
-                if (row.key === 'turnstile_site_key') settings.turnstile_site_key = row.value;
-                if (row.key === 'turnstile_secret_key') settings.turnstile_secret_key = row.value;
             });
         }
 
@@ -46,14 +44,6 @@ export async function onRequestPost(context) {
             if (days >= 1) {
                 await env.DB.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('retention_days', ?)").bind(String(days)).run();
             }
-        }
-
-        // Handle Turnstile keys
-        if (body.turnstile_site_key !== undefined) {
-            await env.DB.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('turnstile_site_key', ?)").bind(String(body.turnstile_site_key)).run();
-        }
-        if (body.turnstile_secret_key !== undefined) {
-            await env.DB.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('turnstile_secret_key', ?)").bind(String(body.turnstile_secret_key)).run();
         }
 
         return new Response(JSON.stringify({ success: true }), {

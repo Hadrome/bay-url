@@ -13,9 +13,8 @@ export async function onRequestPost(context) {
 
         // --- Turnstile Verification ---
         try {
-            const secretStmt = env.DB.prepare("SELECT value FROM settings WHERE key = 'turnstile_secret_key'");
-            const secretResult = await secretStmt.first();
-            const turnstileSecret = secretResult ? secretResult.value : null;
+            // Read from Environment Variables
+            const turnstileSecret = env.TURNSTILE_SECRET_KEY || null;
 
             if (turnstileSecret) {
                 if (!turnstileToken) {

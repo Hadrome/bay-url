@@ -295,12 +295,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.retention_days !== undefined) {
                     document.getElementById('retentionDaysInput').value = data.retention_days;
                 }
-                if (data.turnstile_site_key !== undefined) {
-                    document.getElementById('turnstileSiteKeyInput').value = data.turnstile_site_key;
-                }
-                if (data.turnstile_secret_key !== undefined) {
-                    document.getElementById('turnstileSecretKeyInput').value = data.turnstile_secret_key;
-                }
             } catch (err) {
                 console.error("Settings Error:", err);
             }
@@ -316,9 +310,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.disabled = true;
 
                 const limit = parseInt(document.getElementById('dailyLimitInput').value);
-                const turnstileSiteKey = document.getElementById('turnstileSiteKeyInput').value.trim();
-                const turnstileSecretKey = document.getElementById('turnstileSecretKeyInput').value.trim();
-
                 try {
                     const response = await fetch('/api/settings', {
                         method: 'POST',
@@ -327,9 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             'Admin-Token': authToken
                         },
                         body: JSON.stringify({
-                            daily_limit: limit,
-                            turnstile_site_key: turnstileSiteKey,
-                            turnstile_secret_key: turnstileSecretKey
+                            daily_limit: limit
                         })
                     });
                     if (response.ok) {
