@@ -104,11 +104,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 showDashboard();
             } catch (err) {
                 console.error("Load Links Error:", err);
-                // Check if it's an auth error (401)
                 if (err.message === '未授权') {
+                    alert("Token 错误或过期，请重新登录");
                     logout();
                 } else {
-                    linkList.innerHTML = `<div style="text-align:center;color:red;padding:20px;">加载失败: ${err.message}</div>`;
+                    linkList.innerHTML = `<div style="text-align:center;color:red;padding:20px;">
+                        加载失败: ${err.message}<br>
+                        <small style="color:#666">请检查 Cloudflare 后台 D1 数据库是否初始化成功</small>
+                    </div>`;
+                    showDashboard(); // Force show dashboard to display the error
                 }
             }
         };
