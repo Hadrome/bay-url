@@ -26,6 +26,15 @@ export async function onRequest(context) {
         return new Response("Short URL expired", { status: 410 });
     }
 
+    // Check max_visits (One-time view)
+    if (link.max_visits) {
+        const countStmt = env.DB.prepare("SELECT COUNT(*) as count FROM visits WHERE link_id = ?");
+        const countResult = await countStmt.bind(link.id).first();
+        if (countResult && countResult.count >= link.max_visits) {
+            return new Response("This link has reached its maximum visit limit (Burn after reading).", { status: 410 });
+        }
+    }
+
     // Async logging
     const ip = request.headers.get("CF-Connecting-IP") || "unknown";
     const userAgent = request.headers.get("User-Agent") || "unknown";

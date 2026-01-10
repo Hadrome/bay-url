@@ -32,8 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('/api/config');
             const config = await res.json();
 
+            const widgetContainer = document.getElementById('turnstile-widget');
+
             if (config.turnstile_site_key && window.turnstile) {
-                const widgetContainer = document.getElementById('turnstile-widget');
                 if (widgetContainer) {
                     turnstileWidgetId = turnstile.render('#turnstile-widget', {
                         sitekey: config.turnstile_site_key,
@@ -45,6 +46,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             turnstileToken = null;
                         }
                     });
+                }
+            } else if (!config.turnstile_site_key) {
+                const widgetContainer = document.getElementById('turnstile-widget');
+                if (widgetContainer) {
+                    widgetContainer.innerHTML = '<div style="color:red; font-size:12px; padding:10px;">⚠️ 验证码配置缺失 (Site Key)</div>';
                 }
             }
         } catch (e) {
@@ -90,7 +96,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({
                         url: rawUrl,
                         slug: slugInput.value.trim() || undefined,
-                        turnstileToken: turnstileToken // Send token
+                        expiration: document.getElementById('expirationSelect').value, // Send expiration
+                        turnstileToken: turnstileToken
                     })
                 });
 
@@ -212,9 +219,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         <a href="${link.url}" target="_blank" class="link-origin" title="${link.url}">${link.url}</a>
                         <div class="link-meta">
                             ${link.visits || 0} 次访问 • ${new Date(link.created_at * 1000).toLocaleDateString()}
+                            ${link.max_visits ? ' • <span class="badge">阅后即焚</span>' : ''}
+                            ${link.expires_at ? ` • 📅 ${new Date(link.expires_at * 1000).toLocaleDateString()} 过期` : ''}
                         </div>
                     </div>
-                    <button onclick="deleteLink(${link.id})" class="delete-btn">删除</button>
+                    <div class="actions" style="display:flex; gap:8px;">
+                        <button onclick="updateLink(${link.id})" class="edit-btn" style="background:rgba(0,122,255,0.1); color:#007aff;">设置有效期</button>
+                        <button onclick="deleteLink(${link.id})" class="delete-btn">删除</button>
+                    </div>
                 </div>
             `).join('');
         };
@@ -250,6 +262,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (err) {
                 showToast('操作失败', 'error');
+            }
+        };
+
+
+
+        window.updateLink = async (id) => {
+            const input = prompt("设置有效期：\n输入天数 (如 30)\n输入 0 代表永久有效\n输入 -1 代表阅后即焚 (1次访问)", "30");
+            if (input === null) return;
+
+            const val = parseInt(input);
+            if (isNaN(val)) {
+                showToast('请输入有效数字', 'error');
+                return;
+            }
+
+            let body = {};
+            if (val === -1) {
+                body = { id, action: 'set_1_time' };
+            } else {
+                body = { id, action: 'set_expiry_days', value: val };
+            }
+
+            try {
+                const response = await fetch('/api/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Admin-Token': authToken },
+                    body: JSON.stringify(body)
+                });
+                if (response.ok) {
+                    showToast('有效期已更新');
+                    loadLinks();
+                } else {
+                    showToast('更新失败', 'error');
+                }
+            } catch (e) {
+                showToast('请求失败', 'error');
             }
         };
 

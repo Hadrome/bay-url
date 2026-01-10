@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS links (
   url TEXT NOT NULL,
   slug TEXT NOT NULL UNIQUE,
   created_at INTEGER DEFAULT (unixepoch()),
-  expires_at INTEGER
+  expires_at INTEGER,
+  max_visits INTEGER
 );
 
 DROP TABLE IF EXISTS visits;

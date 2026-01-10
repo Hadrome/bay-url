@@ -2,7 +2,7 @@ export async function onRequestPost(context) {
     const { request, env } = context;
 
     try {
-        const { url, slug: customSlug, turnstileToken } = await request.json();
+        const { url, slug: customSlug, turnstileToken, expiration } = await request.json();
 
         if (!url) {
             return new Response(JSON.stringify({ message: "URL is required" }), {
@@ -100,9 +100,30 @@ export async function onRequestPost(context) {
         }
 
         // Insert into DB
-        await env.DB.prepare("INSERT INTO links (url, slug) VALUES (?, ?)")
-            .bind(url, slug)
-            .run();
+        // Calculate Expiration
+        let expires_at = null;
+        let max_visits = null;
+        const expiration = (await request.json()).expiration || 'none'; // Re-read body carefully or destructure above
+
+        // Fix: Cannot read body twice. Need to restructure top of function.
+        // Let's rewrite the body parsing part or this block.
+        // Wait, I can't re-read stream.
+        // I need to use the destructuring from line 5.
+
+        // RE-PLAN: see below target content logic.
+        // I will replace the INSERT block and rely on variables set earlier.
+        // But variables aren't set earlier. I need to modify the TOP of the file too or just do it here if I have access.
+        // The top of file extracted `url, slug, turnstileToken`. I didn't extract `expiration`.
+        // I need to use `multi_replace` to fix both top and bottom or just `replace` top first.
+
+        // Let's just REPLACE THE WHOLE FILE CONTENT CHUNK or use multi_replace.
+        // Actually, just fetching `expiration` at top is better.
+
+        // Let's do a multi_replace on shorten.js to:
+        // 1. Extract expiration at top.
+        // 2. Logic before INSERT.
+        // 3. Update INSERT statement.
+
 
         return new Response(JSON.stringify({ slug, url }), {
             headers: { "Content-Type": "application/json" }
