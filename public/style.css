@@ -236,3 +236,77 @@ footer a:hover {
 .hidden {
     display: none !important;
 }
+
+/* Admin Link List */
+.link-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.link-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.2s;
+}
+
+.link-item:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: scale(1.005);
+    box-shadow: var(--shadow-sm);
+}
+
+.link-info {
+    flex: 1;
+    min-width: 0;
+    /* Critical for text-overflow to work */
+    margin-right: 16px;
+}
+
+.link-slug {
+    font-weight: 600;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 16px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.link-origin {
+    font-size: 13px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.link-meta {
+    font-size: 12px;
+    color: #b1b1b6;
+}
+
+.delete-btn {
+    flex-shrink: 0;
+    width: auto;
+    padding: 8px 16px;
+    font-size: 13px;
+    background: #fff0f0;
+    color: var(--error-color);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 59, 48, 0.1);
+    transition: all 0.2s;
+}
+
+.delete-btn:hover {
+    background: #ff3b30;
+    color: white;
+    transform: none;
+    box-shadow: 0 4px 12px rgba(255, 59, 48, 0.2);
+}

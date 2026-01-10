@@ -124,15 +124,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             linkList.innerHTML = links.map(link => `
-                <div class="link-item" style="display:flex;justify-content:space-between;align-items:center;padding:15px;border-bottom:1px solid #eee;">
+                <div class="link-item">
                     <div class="link-info">
-                        <a href="/${link.slug}" target="_blank" style="font-weight:600;color:#0071e3;text-decoration:none;">/${link.slug}</a>
-                        <div style="font-size:12px;color:#999;margin-top:4px;">${link.url}</div>
-                        <div style="font-size:12px;color:#bbb;margin-top:2px;">
+                        <a href="/${link.slug}" target="_blank" class="link-slug">/${link.slug}</a>
+                        <div class="link-origin" title="${link.url}">${link.url}</div>
+                        <div class="link-meta">
                             ${link.visits || 0} 次访问 • ${new Date(link.created_at * 1000).toLocaleDateString()}
                         </div>
                     </div>
-                    <button onclick="deleteLink(${link.id})" style="width:auto;padding:6px 12px;font-size:12px;background:#ffeeee;color:#ff3b30;border-radius:6px;">删除</button>
+                    <button onclick="deleteLink(${link.id})" class="delete-btn">删除</button>
                 </div>
             `).join('');
         };
