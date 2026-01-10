@@ -1,0 +1,12 @@
+{
+  "name": "bay-url",
+  "version": "1.0.0",
+  "description": "Cloudflare Pages URL Shortener with D1",
+  "scripts": {
+    "dev": "wrangler pages dev public --d1 DB=bay-url-db",
+    "deploy": "wrangler pages deploy public"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}

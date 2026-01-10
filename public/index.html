@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云链 - 极简短链接服务</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>云链</h1>
+            <p class="subtitle">Cloudflare 驱动的极简短链服务</p>
+            
+            <form id="shortenForm">
+                <div class="form-group">
+                    <label for="urlInput">目标链接</label>
+                    <input type="url" id="urlInput" placeholder="https://example.com/very-long-url..." required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="slugInput">自定义短码 (可选)</label>
+                    <input type="text" id="slugInput" placeholder="custom-name" pattern="[a-zA-Z0-9-_]+" maxlength="20">
+                </div>
+
+                <div id="errorMsg" class="error-message"></div>
+                
+                <button type="submit">缩短链接</button>
+            </form>
+
+            <div id="result" class="result">
+                <p>生成成功！</p>
+                <a href="#" id="shortUrl" class="short-url" target="_blank"></a>
+                <button id="copyBtn" class="copy-btn">复制链接</button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>&copy; 2026 BayUrl Project. All rights reserved.</p>
+            <p><a href="/admin.html" style="color: var(--text-muted); text-decoration: none;">管理后台</a></p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
