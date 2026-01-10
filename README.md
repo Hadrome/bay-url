@@ -1,6 +1,7 @@
 # ☁️ BayUrl - Cloudflare 极简短链服务
 
-[![Deploy to Cloudflare Pages](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/your-username/bay-url)
+# ☁️ BayUrl - Cloudflare 极简短链服务
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 **BayUrl** 是一个运行在 Cloudflare Pages 上的现代化短链接服务。它无需购买服务器，利用 Cloudflare 的全球边缘网络和 D1 数据库，提供极速、免费、稳定的短链生成与重定向服务。
@@ -20,9 +21,9 @@
 
 ## 📖 部署教程
 
-我们在下方提供了两种部署方式，推荐新手使用 **方案一**。
+由于本项目依赖 `public` 静态目录，必须使用 **Cloudflare Pages** 进行部署。请勿使用 Workers 部署按钮（会导致静态资源失效）。
 
-### 方案一：GitHub 一键部署 (推荐)
+### 方案一：网页控制台部署 (推荐)
 
 这种方式无需接触命令行，全在网页上操作。
 
@@ -32,13 +33,17 @@
 #### 2. 创建 Cloudflare Pages 项目
 1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)。
 2. 进入 **Compute (Workers & Pages)** -> **Overview**。
-3. 点击 **Create Application** -> **Pages** -> **Connect to Git**。
-4. 选择你刚刚 Fork 的 `bay-url` 仓库，点击 **Begin setup**。
-5. **Build settings** 保持默认（无需修改）：
+3. 点击 **Create Application**。
+4. **关键步骤**：点击切换到 **Pages** 标签页（不要留在 Workers 页面）。
+5. 点击 **Connect to Git**。
+6. 选择 `Hadrome/bay-url` 仓库，点击 **Begin setup**。
+7. **Build settings** 保持默认：
+   - Project name: `bay-url`
+   - Production branch: `main`
    - Framework preset: `None`
    - Build command: (空)
-   - Build output directory: `public`
-6. 点击 **Save and Deploy**。
+   - Build output directory: `public` (务必确认此项)
+8. 点击 **Save and Deploy**。
 
 #### 3. 创建并绑定数据库
 项目部署完成后，需要设置数据库：
@@ -81,7 +86,7 @@
 
 ```bash
 # 1. 克隆项目
-git clone https://github.com/your-username/bay-url.git
+git clone https://github.com/Hadrome/bay-url.git
 cd bay-url
 
 # 2. 安装依赖
