@@ -34,7 +34,7 @@
 3. 点击 **Create Application**。
 4. **关键步骤**：点击切换到 **Pages** 标签页（不要留在 Workers 页面）。
 5. 点击 **Connect to Git**。
-6. 选择 `Hadrome/bay-url` 仓库，点击 **Begin setup**。
+6. 选择 `<your-username>/bay-url` 仓库，点击 **Begin setup**。
 7. **Build settings** 保持默认：
    - Project name: `bay-url`
    - Production branch: `main`
@@ -97,7 +97,7 @@
 
 ```bash
 # 1. 克隆项目
-git clone https://github.com/Hadrome/bay-url.git
+git clone https://github.com/<your-username>/bay-url.git
 cd bay-url
 
 # 2. 安装依赖
