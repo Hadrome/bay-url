@@ -142,18 +142,18 @@ body::after {
 }
 
 .logo-wrapper {
-    width: 100px;
-    height: 85px;
-    /* Crop bottom text */
+    width: 140px;
+    height: 120px;
+    /* Adjusted height for larger logo */
     overflow: hidden;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
     display: flex;
     justify-content: center;
     align-items: flex-start;
 }
 
 .logo-img {
-    width: 100px;
+    width: 140px;
     height: auto;
     object-fit: cover;
 }
@@ -169,15 +169,10 @@ body::after {
     display: inline-block;
 }
 
-.logo-author {
-    font-size: 14px;
-    color: var(--text-secondary);
-    font-weight: 500;
-    margin-top: -5px;
-    /* Pull closer to main text */
-    margin-bottom: 5px;
-    opacity: 0.8;
+display: inline-block;
 }
+
+/* logo-author removed */
 
 .logo-subtitle {
     font-size: 14px;
@@ -837,6 +832,26 @@ input[type="checkbox"]:checked {
 /* Utility */
 .hidden {
     display: none !important;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-bottom: 20px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+footer a {
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+footer a:hover {
+    color: var(--primary-blue);
 }
 
 /* Responsive */
