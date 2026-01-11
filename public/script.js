@@ -450,8 +450,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const data = await response.json();
 
+                // 今日数据
                 document.getElementById('todayVisits').textContent = data.today.visits;
                 document.getElementById('todayLinks').textContent = data.today.links;
+
+                // 当月数据
+                if (data.month) {
+                    document.getElementById('monthVisits').textContent = data.month.visits;
+                    document.getElementById('monthLinks').textContent = data.month.links;
+                }
+
+                // 总计数据
+                if (data.total) {
+                    document.getElementById('totalVisits').textContent = data.total.visits;
+                    document.getElementById('totalLinks').textContent = data.total.links;
+                }
             } catch (err) {
                 console.error("Dashboard Error:", err);
             }

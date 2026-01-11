@@ -326,55 +326,39 @@ button:disabled {
     margin-bottom: 28px;
 }
 
-/* Stats Grid */
+/* Stats Grid - 统计卡片网格 */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
     margin-bottom: 24px;
 }
 
 .stat-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%);
-    padding: 24px;
-    border-radius: var(--radius-l);
+    background: rgba(0, 0, 0, 0.02);
+    padding: 20px;
+    border-radius: var(--radius-m);
     text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    transition: all 0.3s var(--ease-out-expo);
-    position: relative;
-    overflow: hidden;
-}
-
-.stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--apple-blue), var(--apple-purple));
-    opacity: 0;
-    transition: opacity 0.3s;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    transition: background 0.2s;
 }
 
 .stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-md);
+    background: rgba(0, 0, 0, 0.04);
 }
 
-.stat-card:hover::before {
-    opacity: 1;
+.stat-card h3 {
+    font-size: 12px;
+    text-transform: none;
+    letter-spacing: 0;
+    margin-bottom: 8px;
 }
 
 .stat-value {
-    font-size: 42px;
+    font-size: 32px;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--gray-900), var(--gray-600));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-top: 8px;
-    letter-spacing: -0.04em;
+    color: var(--text-primary);
+    letter-spacing: -0.03em;
 }
 
 /* Settings Panel */
@@ -800,17 +784,32 @@ input[type="checkbox"]:checked {
 }
 
 /* Responsive */
+@media (max-width: 900px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media (max-width: 768px) {
     .card {
-        padding: 32px 24px;
+        padding: 28px 20px;
     }
 
     .logo-text {
-        font-size: 42px;
+        font-size: 36px;
     }
 
     .stats-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 16px;
+    }
+
+    .stat-value {
+        font-size: 26px;
     }
 
     .actions {
@@ -820,5 +819,10 @@ input[type="checkbox"]:checked {
     .link-item {
         flex-direction: column;
         align-items: stretch;
+    }
+
+    .collapsible-header {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
