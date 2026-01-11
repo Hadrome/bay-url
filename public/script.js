@@ -208,6 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                     <div class="actions">
+                        <button onclick="updateOriginalUrl(${link.id}, '${link.url}')" class="edit-btn" style="background:rgba(88,86,214,0.1); color:#5856D6;">修改目标</button>
                         <button onclick="updateNote(${link.id}, '${(link.note || '').replace(/'/g, "\\'")}')" class="note-btn" style="background:rgba(255,149,0,0.1); color:#ff9500;">备注</button>
                         <button onclick="updateLink(${link.id})" class="edit-btn" style="background:rgba(0,122,255,0.1); color:#007aff;">有效期</button>
                         <button onclick="deleteLink(${link.id})" class="delete-btn">删除</button>
@@ -438,6 +439,33 @@ document.addEventListener('DOMContentLoaded', () => {
             loadDashboard();
             loadSettings();
         }
+
+        window.updateOriginalUrl = async (id, currentUrl) => {
+            const newUrl = prompt("修改跳转目标链接：", currentUrl);
+            if (!newUrl || newUrl === currentUrl) return;
+
+            if (!/^https?:\/\//i.test(newUrl)) {
+                showToast('请输入完整的 http/https 链接', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Admin-Token': authToken },
+                    body: JSON.stringify({ id, action: 'set_url', value: newUrl })
+                });
+                if (response.ok) {
+                    showToast('目标链接已更新');
+                    loadLinks(currentPage, searchQuery);
+                } else {
+                    const data = await response.json();
+                    showToast(data.error || '更新失败', 'error');
+                }
+            } catch (e) {
+                showToast('请求失败', 'error');
+            }
+        };
 
         // --- Dashboard & Settings Logic ---
 

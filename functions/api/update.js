@@ -26,6 +26,12 @@ export async function onRequestPost(context) {
             stmt = env.DB.prepare("UPDATE links SET expires_at = NULL, max_visits = 1 WHERE id = ?").bind(id);
         } else if (action === 'set_note') {
             stmt = env.DB.prepare("UPDATE links SET note = ? WHERE id = ?").bind(value, id);
+        } else if (action === 'set_url') {
+            // Validate URL format simply
+            if (!value || !value.startsWith('http')) {
+                return new Response(JSON.stringify({ error: "Invalid URL" }), { status: 400 });
+            }
+            stmt = env.DB.prepare("UPDATE links SET url = ? WHERE id = ?").bind(value, id);
         } else {
             return new Response(JSON.stringify({ error: "Invalid action" }), { status: 400 });
         }
