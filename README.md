@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/logo.png" alt="BayUrl Logo" width="120" />
+  <img src="public/logo.png" alt="BayUrl Logo" width="180" />
 </p>
 
 <h1 align="center">BayUrl</h1>
